@@ -1,1 +1,2 @@
-- [ ] Replace folder deletion with individual file replacement for updation
+- [X] Replace folder deletion with individual file replacement for updation
+- [ ] Image collision issue with individual file replacement and image naming, linking issue in general as well
