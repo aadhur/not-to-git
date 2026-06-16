@@ -21,7 +21,7 @@ def content_check(name: str):
     for root, dirs, files in os.walk(name):
         for file in files:
             file_path = os.path.join(root, file)
-            if not zipfile.is_zipfile(file_path):
+            if not zipfile.is_zipfile(file_path) and not file_path.lower().endswith('.csv'):
                 print(file)
     print("------------------")
 
@@ -45,7 +45,7 @@ def github_move(dirname: str, reponame: str, f_name: str):
         for root, dirs, files in os.walk(dirname):
             for file in files:
                 file_path = os.path.join(root, file)
-                if not zipfile.is_zipfile(file_path):
+                if not zipfile.is_zipfile(file_path) and not file_path.lower().endswith('.csv'):
                     files_to_move.append(file_path)
         for file_path in files_to_move:
             print("Moving file:", os.path.basename(file_path))
