@@ -32,13 +32,13 @@ def github_move(dirname: str, reponame: str, f_name: str):
         return False
     else:
         f_dir = os.path.join(local_github_dir, f_name)
-        if os.path.isdir(f_dir):
-            resp = input("Folder already exists. Wish to overwrite? (Y/n): ")
-            if resp == "Y":
-                shutil.rmtree(f_dir)
-            else:
-                print("Please choose a different folder name")
-                return False
+        # if os.path.isdir(f_dir):
+        #     resp = input("Folder already exists. Wish to overwrite? (Y/n): ")
+        #     if resp == "Y":
+        #         shutil.rmtree(f_dir)
+        #     else:
+        #         print("Please choose a different folder name")
+        #         return False
         os.makedirs(f_dir, exist_ok=True)
         print("-------------------")
         files_to_move = []
@@ -48,16 +48,23 @@ def github_move(dirname: str, reponame: str, f_name: str):
                 if not zipfile.is_zipfile(file_path) and not file_path.lower().endswith('.csv'):
                     files_to_move.append(file_path)
         for file_path in files_to_move:
-            print("Moving file:", os.path.basename(file_path))
+            filename = os.path.basename(file_path)
+            destination_path = os.path.join(f_dir, filename)
+            if os.path.exists(destination_path):
+                resp = input(f"{filename} already exists. Wish to overwrite? (Y/n): ")
+                if resp == "Y":
+                    os.remove(destination_path)
+                else:
+                    print(f"Skipping: {filename}")
+                    continue  
+            print("Moving file:", filename)
             shutil.move(file_path, f_dir)
         shutil.rmtree(dirname)
     return True
 
 
-def reformat_titles(repo_name: str, fname: str):
-    local_github_dir = os.path.join(LOCAL_GITHUB_DIR, repo_name)
-    f_dir = os.path.join(local_github_dir, fname)
-    for root, dirs, files in os.walk(f_dir):
+def reformat_titles(dir_name: str):
+    for root, dirs, files in os.walk(dir_name):
         for file in files:
             old_path = os.path.join(root, file)
             if file.endswith('.md'):
@@ -99,6 +106,8 @@ def main():
         content_check(dir_name)
     else:
         print("Problem with unzipping: Retry.")
+    
+    reformat_titles(dir_name)
 
     resp = input("Do you wish to move it to local github repo?(Y/n): ")
     if resp == "n":
@@ -112,8 +121,6 @@ def main():
     else:
         print("Invalid option.")
         return
-
-    reformat_titles(repo_name, f_name)
 
     resp2 = input("Do you wish to push to remote github repo?(Y/n): ")
     if resp2 == "Y":
